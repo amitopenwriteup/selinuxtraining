@@ -1,0 +1,41 @@
+Configure Sudo Rules
+# Create sudo rule
+ipa sudorule-add developers-sudo --desc="Developers sudo access"
+
+# Add users to sudo rule
+ipa sudorule-add-user developers-sudo --groups=developers
+
+# Add commands to sudo rule
+ipa sudorule-add-allow-command developers-sudo --sudocmds="/usr/bin/systemctl"
+
+# Add hosts to sudo rule
+ipa sudorule-add-host developers-sudo --hosts=idm-server.local.test
+
+# View sudo rules
+ipa sudorule-show developers-sudo
+
+IDM Client Configuration
+
+Step 1: Prepare Client System
+# On client system
+sudo dnf install -y ipa-client
+
+
+# Configure automatic home directory creation
+sudo authselect select sssd with-mkhomedir --force
+
+# Restart services
+sudo systemctl restart sssd
+sudo systemctl restart oddjobd
+Step 2: Test Client Authentication
+# Test user login
+su - jay
+id
+
+# Test group membership
+groups
+
+# Test sudo access
+sudo systemctl status sshd
+
+

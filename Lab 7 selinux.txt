@@ -1,0 +1,70 @@
+MCS labels so that:
+
+->`file1` has category `c0`
+->`file2` has category `c1`
+->A user/process with `s0:c0` can only access file1
+->A user/process with `s0:c1` can only access file2
+
+---
+
+--- 🧪 Step-by-Step Lab (on RHEL/CentOS/Fedora)
+
+---
+
+---# 1 Check SELinux status
+
+
+getenforce
+
+# Should be: Enforcing
+
+
+---
+
+---# 2.= Create the test files
+
+
+sudo touch /tmp/file1 /tmp/file2
+
+
+---
+
+---# 3. See current labels
+
+
+ls -Z /tmp/file1 /tmp/file2
+
+
+You’ll see default like:
+
+
+system_u:object_r:tmp_t:s0
+
+
+---
+
+---# 4. Assign MCS categories
+
+->`file1` → `s0:c0`
+->`file2` → `s0:c1`
+
+
+sudo chcon -l s0:c0 /tmp/file1
+sudo chcon -l s0:c1 /tmp/file2
+
+
+---
+
+---# 5. Verify labels
+
+
+ls -Z /tmp/file*
+
+
+Should show something like:
+
+
+system_u:object_r:tmp_t:s0:c0 /tmp/file1
+system_u:object_r:tmp_t:s0:c1 /tmp/file2
+
+

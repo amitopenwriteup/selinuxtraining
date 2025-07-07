@@ -1,0 +1,16 @@
+Step 1: Install SELinux Tools
+Install required packages:
+
+sudo dnf install -y policycoreutils policycoreutils-python-utils setools-console
+
+Step 2: Check SELinux Status & Mode
+
+sestatus
+getenforce
+
+
+Optional If SELinux is disabled, enable it by editing the config file:
+
+sudo cat /etc/selinux/config
+# Change to:
+SELINUX=enforcing

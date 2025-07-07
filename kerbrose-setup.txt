@@ -1,0 +1,28 @@
+Lab 3: Kerberos Authentication Configuration
+Step 1: Configure Kerberos Client
+# Install Kerberos client tools
+	
+cat /etc/krb5.conf
+
+
+# Test Kerberos authentication
+kinit amit
+klist
+
+Step 2: Configure SSH with Kerberos
+# Edit SSH configuration
+sudo vi /etc/ssh/sshd_config
+
+Modify below lies
+
+KerberosAuthentication yes
+GSSAPIAuthentication yes
+GSSAPICleanupCredentials yes
+
+# Restart SSH service
+sudo systemctl restart sshd
+
+
+# Test SSH with Kerberos
+ssh -K amit@local.test
+

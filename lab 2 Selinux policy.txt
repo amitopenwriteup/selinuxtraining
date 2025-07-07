@@ -1,0 +1,44 @@
+
+
+Setup Apache (httpd) and View SELinux Labels
+
+1. Install and Start Apache
+
+
+sudo dnf install -y httpd
+sudo systemctl enable --now httpd
+
+
+---
+2. Check File Contexts (Labels)
+
+
+ls -Z /var/www/html
+
+
+> Shows the SELinux label of website files (should be `httpd_sys_content_t`).
+
+---
+
+3. Check Process Context for `httpd`
+
+
+ps -eZ | grep httpd
+
+
+Shows context like: `system_u:system_r:httpd_t:s0`
+
+---
+SELinux and Ports
+
+ 4. View SELinux Port Policy for Apache
+
+
+sudo semanage port -l | grep http_port_t
+
+
+> Output example:
+
+
+http_port_t              tcp      80, 443, 488, 8008, 8009, 8443
+

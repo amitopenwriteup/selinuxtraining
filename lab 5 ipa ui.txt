@@ -1,0 +1,25 @@
+Lab 5: Web UI Administration
+Access Web Interface
+1.	Open browser to https://idm-server.example.com
+2.	Login with admin credentials
+3.	Navigate through different sections: 
+ o	Identity → Users
+	Identity → Groups
+o	Policy → Sudo Rules
+o	Authentication → Certificates
+Web UI Tasks
+1.	Create User via Web UI:
+o	Navigate to Identity → Users
+o	Click "Add" button
+o	Fill in user details
+o	Set password
+2.	Create Group via Web UI:
+o	Navigate to Identity → Groups
+o	Click "Add" button
+o	Add group name and description
+o	Add members to group
+3.	Configure Password Policy:
+o	Navigate to Policy → Password Policies
+o	Create new policy or modify existing
+o	Set password complexity requirements
+

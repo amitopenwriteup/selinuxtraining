@@ -1,0 +1,61 @@
+Additional Localhost Verification Steps:
+# Test if IDM services are responding
+curl -k https://idm-server.local.test/ipa/ui/
+
+# Check if DNS is working properly
+dig @localhost idm-server.local.test
+
+# Verify Kerberos realm
+klist -k /etc/krb5.keytab
+
+# Test LDAP connectivity
+ldapsearch -x -H ldap://idm-server.local.test -b "dc=local,dc=test"
+
+
+
+#CLI to add user
+ipa user-add amit --first=Amit --last=Patel --email=amit@local.test
+ipa user-add jay --first=Jay --last=Shah --email=jay@local.test
+ipa user-add deepak --first=Deepak --last=Mehta --email=deepak@local.test
+
+# Set user passwords
+ipa passwd amit
+
+
+Step 2: Create and Manage Groups
+# Create groups
+ipa group-add developers --desc="Development Team"
+ipa group-add admins --desc="System Administrators"
+ipa group-add users --desc="Regular Users"
+
+# Add users to groups
+ipa group-add-member developers --users=jay
+ipa group-add-member admins --users=amit
+ipa group-add-member users --users=deepak
+
+
+# View group membership
+ipa group-show developers
+ipa group-show admins
+
+# Create nested groups
+ipa group-add it-staff --desc="IT Staff"
+ipa group-add-member it-staff --groups=developers,admins
+Step 3: User Management Commands
+# List all users
+ipa user-find
+
+# Modify user attributes
+ipa user-mod amit --title="Senior Developer"
+ipa user-mod amit --phone="+91-555-1234"
+
+# Disable/Enable users
+ipa user-disable jay
+ipa user-enable jay
+
+# Delete users
+ipa user-del Deepak
+
+
+
+

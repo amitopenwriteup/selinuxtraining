@@ -1,0 +1,25 @@
+Concepts Review
+# Ingress: Traffic coming INTO the system
+# Egress: Traffic going OUT of the system
+
+# View current network connections
+ss -tuln
+netstat -tuln
+ip addr|grep ens
+
+# Monitor network traffic
+sudo tcpdump -i ens160 -n
+
+
+-------------------------
+Lab nft
+
+nft --version
+
+systemctl status nftables
+
+systemctl enable nftables
+
+systemctl start nftables
+
+systemctl status nftables

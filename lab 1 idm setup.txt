@@ -1,0 +1,64 @@
+Step 1: Prepare the System (Localhost Setup)
+# Update system
+sudo dnf update -y
+
+# Install required packages
+sudo dnf install -y ipa-server ipa-server-dns bind-dyndb-ldap
+
+Step 2: Configure Firewall
+# Allow IDM services through firewall
+sudo firewall-cmd --permanent --add-service=freeipa-ldap
+sudo firewall-cmd --permanent --add-service=freeipa-ldaps
+sudo firewall-cmd --permanent --add-service=dns
+sudo firewall-cmd --permanent --add-service=ntp
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --permanent --add-service=kerberos
+sudo firewall-cmd --permanent --add-service=kpasswd
+sudo firewall-cmd --reload
+
+# Verify firewall rules
+sudo firewall-cmd --list-all
+
+
+
+# Set hostname with test domain
+sudo hostnamectl set-hostname idm-server.local.test
+
+# Update /etc/hosts
+sudo vi /etc/hosts
+# Add this line (replace with your actual IP):
+# 192.168.1.50 idm-server.local.test idm-server localhost.localdomain localhost
+
+sudo ipa-server-install \
+  --realm=LOCAL.TEST \
+  --domain=local.test \
+  --ds-password=SecurePassword123 \
+  --admin-password=AdminPassword123 \
+  --hostname=idm-server.local.test \
+  --setup-dns \
+  --forwarder=8.8.8.8 \
+  --forwarder=1.1.1.1 \
+  --unattended
+
+
+Step 4: Verify Installation (Localhost)
+# Check IDM status
+sudo ipactl status
+
+# Test Kerberos authentication
+kinit admin
+klist
+
+# Test DNS resolution
+nslookup idm-server.local.test
+dig idm-server.local.test
+
+#ipa lab setup
+
+
+# Access Web UI
+# Open browser to: https://idm-server.local.test
+
+username:admin
+Password:AdminPassword123

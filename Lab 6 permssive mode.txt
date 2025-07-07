@@ -1,0 +1,36 @@
+# Remove port 8081 from http_port_t if it was previously added
+sudo semanage port -d -t http_port_t -p tcp 8081
+
+# Verify removal
+sudo semanage port -l | grep http_port_t
+# Port 8081 should not be listed
+
+sudo systemctl restart httpd
+sudo systemctl status httpd
+
+#It will fail
+
+#Set SELinux to Permissive and Monitor Logs
+
+# Set SELinux to permissive mode for testing
+sudo setenforce 0
+
+# Verify mode change
+getenforce
+# Should show: Permissive
+
+# Start httpd service (will work in permissive mode)
+sudo systemctl restart httpd
+sudo systemctl status httpd
+
+# Test connection
+curl -I http://localhost:8081
+
+# Monitor SELinux logs for denials (even in permissive mode)
+sudo ausearch -m avc -ts recent | grep httpd
+# This shows what would be blocked in enforcing mode
+
+
+# Alternative: use journalctl
+systemctl restart httpd
+sudo journalctl -f | grep -i selinux

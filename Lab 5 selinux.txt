@@ -1,0 +1,60 @@
+Scenario: Apache (`httpd_t`) can't write to a log file labeled `var_log_t`
+
+Lab Setup: SELinux Denial Due to Context Mismatch
+
+sudo systemctl status httpd 
+
+Step 3: Create a Custom Log Directory
+
+
+sudo mkdir /customlogs
+sudo chown apache:apache /customlogs
+sudo chmod 755 /customlogs
+
+
+ Step 4: Configure Apache to Write Logs Here
+
+Edit Apache config:
+
+
+sudo nano /etc/httpd/conf/httpd.conf
+
+ change:
+
+
+ErrorLog "/customlogs/error_log"
+
+
+Save and exit.
+
+ Step 5: Restart Apache and Observe
+
+sudo systemctl restart httpd
+Check status:
+
+sudo systemctl status httpd
+
+It **may fail** silently or with `permission denied`.
+
+Step 6: Check SELinux Denials
+sudo ausearch -m avc -ts recent
+
+
+sudo journalctl -xe | grep httpd
+
+
+Step 7: Fix It with the Correct Context
+
+Apache expects logs to be labeled with **`httpd_log_t`**, not `var_log_t`.
+
+
+sudo semanage fcontext -a -t httpd_log_t "/customlogs(/.*)?"
+sudo restorecon -Rv /customlogs
+
+Step 8: Restart and Verify
+
+
+sudo systemctl restart httpd
+
+
+

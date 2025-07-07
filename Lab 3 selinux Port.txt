@@ -1,0 +1,46 @@
+# Confirm SELinux is enforcing
+getenforce
+# Should show: Enforcing
+sestatus
+
+#Edit the config:
+sudo nano /etc/httpd/conf/httpd.conf
+Replace:
+
+Listen 80
+
+with:
+
+Listen 8081
+
+#Check httpd Service Status
+# Try to start httpd service
+sudo systemctl start httpd
+sudo systemctl status httpd
+
+# Check for specific error messages
+sudo journalctl -u httpd -f
+
+#Check for SELinux Denials
+
+# Look for recent AVC denials
+sudo ausearch -m avc -ts recent | grep httpd
+
+# Alternative: Check audit log
+sudo tail -f /var/log/audit/audit.log | grep httpd
+
+# Check messages log
+sudo tail -f /var/log/messages | grep httpd
+
+
+#Check Current HTTP Ports Allowed by SELinux
+
+# List all ports allowed for httpd
+sudo semanage port -l | grep http
+# Output should show:
+# http_port_t                    tcp      80, 81, 443, 488, 8008, 8009, 8443, 9000
+
+# Check specific port 8081
+sudo semanage port -l | grep 8081
+# If empty, port 8081 is not assigned to any service
+

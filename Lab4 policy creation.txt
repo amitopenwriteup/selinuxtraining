@@ -1,0 +1,59 @@
+# Create development directory
+mkdir -p ~/selinux-policies/httpd-8081
+cd ~/selinux-policies/httpd-8081
+
+Scenario Setup
+
+1. Prepare the Environment
+# Remove port 8081 from http_port_t if present
+sudo semanage port -d -t http_port_t -p tcp 8081 2>/dev/null || echo "Port not in policy"
+
+# Configure httpd to use port 8081
+sudo sed -i 's/Listen 80/Listen 8081/' /etc/httpd/conf/httpd.conf
+
+# Verify configuration
+grep "Listen" /etc/httpd/conf/httpd.conf
+
+# Set SELinux to permissive for testing
+sudo setenforce 0
+
+# Start httpd to generate denials
+sudo systemctl start httpd
+sudo systemctl status httpd
+
+# Generate some activity to create log entries
+curl -I http://localhost:8081
+
+# Set back to enforcing to see denials
+sudo setenforce 1
+sudo systemctl restart httpd
+2. Collect AVC Denials
+# Check for recent denials
+sudo ausearch -m avc -ts recent | grep httpd
+
+
+Generate Policy from Audit Log
+
+# Generate policy module from denials
+sudo ausearch -m avc -ts recent | grep httpd | audit2allow -M httpd_port_8081
+
+# This creates two files:
+# - httpd_port_8081.te (Type Enforcement file)
+# - httpd_port_8081.pp (Compiled policy package)
+
+# Review the generated policy
+cat httpd_port_8081.te
+
+Install and Test the Policy
+# Install the policy module
+sudo semodule -i httpd_port_8081.pp
+
+# Verify installation
+sudo semodule -l | grep httpd_port_8081
+
+# Test httpd service
+sudo systemctl start httpd
+sudo systemctl status httpd
+
+
+

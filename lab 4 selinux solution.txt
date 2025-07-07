@@ -1,0 +1,12 @@
+Solution
+
+# Add port 8081 to the httpd_port_t type
+sudo semanage port -a -t http_port_t -p tcp 8081
+
+# Verify the port was added
+sudo semanage port -l | grep http_port_t
+# Should now include port 8081
+
+# Start httpd service
+sudo systemctl start httpd
+sudo systemctl status httpd
