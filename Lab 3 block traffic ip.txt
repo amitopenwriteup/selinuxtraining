@@ -1,0 +1,41 @@
+# Create the 'filter' table in the 'inet' family (if it doesn't exist)
+nft add table inet filter
+
+# Create 'input' chain with default policy (if it doesn't exist)
+nft add chain inet filter input { type filter hook input priority 0 \; policy accept \; }
+
+# Add rule to block traffic from 192.168.111.135
+nft add rule inet filter input ip saddr 192.168.111.135 drop
+
+# Save the ruleset to persist after reboot (optional depending on OS)
+nft list ruleset > /etc/nftables.conf
+
+# Enable nftables service on boot (systemd-based systems)
+systemctl enable nftables
+
+
+Verify
+
+# 1. Confirm the rule exists in the ruleset
+nft list ruleset | grep "192.168.111.135"
+
+# 2. List all rules in the input chain
+nft list chain inet filter input
+
+# 3. View packet counters (if you used 'counter' in rule)
+nft list chain inet filter input
+
+# 4. From the blocked IP (192.168.111.135), try:
+ping -c 3 [YOUR_SERVER_IP]
+telnet [YOUR_SERVER_IP] 80
+ssh [YOUR_SERVER_IP]
+
+# 5. Monitor nftables events live
+nft monitor
+
+# 6. View system logs for dropped traffic
+journalctl -f | grep -i drop
+dmesg | grep -i nft
+
+# 7. Monitor traffic from the IP using tcpdump
+tcpdump -i any host 192.168.111.135

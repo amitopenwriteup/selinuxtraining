@@ -1,0 +1,29 @@
+# Complete small office firewall configuration
+sudo nft flush ruleset
+
+# Create tables
+sudo nft add table inet office_filter
+sudo nft add table inet office_nat
+
+# Filter chains
+sudo nft add chain inet office_filter input { type filter hook input priority 0\; policy drop\; }
+sudo nft add chain inet office_filter forward { type filter hook forward priority 0\; policy drop\; }
+sudo nft add chain inet office_filter output { type filter hook output priority 0\; policy accept\; }
+
+# NAT chains
+sudo nft add chain inet office_nat prerouting { type nat hook prerouting priority -100\; }
+sudo nft add chain inet office_nat postrouting { type nat hook postrouting priority 100\; }
+
+# Basic allowed traffic
+sudo nft add rule inet office_filter input iifname lo accept
+sudo nft add rule inet office_filter input ct state established,related accept
+
+# Allow internal network
+sudo nft add rule inet office_filter input ip saddr 192.168.1.0/24 accept
+sudo nft add rule inet office_filter forward ip saddr 192.168.1.0/24 accept
+
+# Allow specific external services
+sudo nft add rule inet office_filter input tcp dport { 22, 80, 443 } accept
+
+# NAT for internal users
+sudo nft add rule inet office_nat postrouting ip saddr 192.168.1.0/24 oifname eth0 masquerade

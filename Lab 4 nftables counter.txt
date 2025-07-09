@@ -1,0 +1,20 @@
+# Create a basic inet table (handles both IPv4 and IPv6)
+sudo nft add table inet filter
+
+# Create an input chain with default accept policy
+sudo nft add chain inet filter input { type filter hook input priority 0\; policy accept\; }
+
+# List the current configuration
+sudo nft list table inet filter
+
+# Add a simple rule to count packets
+sudo nft add rule inet filter input counter
+
+# Check rule statistics
+sudo nft list table inet filter
+
+Verification:
+
+# Generate some traffic and check counters
+ping -c 5 localhost
+sudo nft list table inet filter

@@ -1,0 +1,20 @@
+Set up Apache on Client (Web Server)
+
+Follow the script you posted on idm-client.local.test. Key steps:
+
+1.Install Apache + Kerberos modules:
+sudo dnf install httpd mod_auth_gssapi mod_ssl
+
+2.Create the HTTP service principal and keytab on the server:
+kinit admin
+
+3.Run on master
+  ipa dnsrecord-add local.test idm-client --a-rec <client ip>
+
+4.Run on client
+ipa service-add HTTP/idm-client.local.test
+ipa-getkeytab -s idm-server.local.test -p HTTP/idm-client.local.test -k /etc/httpd/conf/httpd.keytab
+
+5.Secure the keytab:
+chown apache:apache /etc/httpd/conf/httpd.keytab
+chmod 640 /etc/httpd/conf/httpd.keytab

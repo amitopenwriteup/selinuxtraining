@@ -1,0 +1,24 @@
+Lab 5: Basic Packet Filtering
+# Create a fresh table and chain
+sudo nft flush ruleset
+sudo nft add table inet filter
+sudo nft add chain inet filter input { type filter hook input priority 0\; policy drop\; }
+
+# Allow loopback traffic
+sudo nft add rule inet filter input iifname lo accept
+
+# Allow established and related connections
+sudo nft add rule inet filter input ct state established,related accept
+
+# Allow SSH (port 22)
+sudo nft add rule inet filter input tcp dport 22 accept
+
+# Allow HTTP and HTTPS
+sudo nft add rule inet filter input tcp dport { 80, 443 } accept
+
+# Allow ping (ICMP)
+sudo nft add rule inet filter input icmp type echo-request accept
+sudo nft add rule inet filter input icmpv6 type echo-request accept
+
+# Log dropped packets
+sudo nft add rule inet filter input log prefix \"[nftables] Dropped: \" drop

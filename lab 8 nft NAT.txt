@@ -1,0 +1,19 @@
+Lab 8
+
+# Flush existing NAT table if it exists
+sudo nft flush table inet nat 2>/dev/null
+sudo nft delete table inet nat 2>/dev/null
+
+# Create NAT table
+sudo nft add table inet nat
+
+# Create chains for NAT
+sudo nft add chain inet nat prerouting { type nat hook prerouting priority -100\; }
+sudo nft add chain inet nat postrouting { type nat hook postrouting priority 100\; }
+
+# Masquerade for outgoing traffic (assuming ens160 is your external interface)
+sudo nft add rule inet nat postrouting oifname ens160 masquerade
+
+# Port forwarding: external port 8080 -> internal 192.168.111.100:80
+sudo nft add rule inet nat prerouting iifname ens160 tcp dport 8080 dnat ip to 192.168.111.100:80
+

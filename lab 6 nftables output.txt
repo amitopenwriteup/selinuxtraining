@@ -1,0 +1,31 @@
+Lab 3: Output Filtering
+Objective: Control outgoing traffic from your system.
+# Add output chain
+sudo nft add chain inet filter output { type filter hook output priority 0\; policy accept\; }
+
+# Allow loopback
+sudo nft add rule inet filter output oifname lo accept
+
+# Allow established connections
+sudo nft add rule inet filter output ct state established accept
+
+# Allow specific outgoing connections
+sudo nft add rule inet filter output tcp dport 53 accept  # DNS
+sudo nft add rule inet filter output udp dport 53 accept  # DNS
+sudo nft add rule inet filter output tcp dport 80 accept  # HTTP
+sudo nft add rule inet filter output tcp dport 443 accept # HTTPS
+sudo nft add rule inet filter output tcp dport 22 accept  # SSH
+
+# Change policy to drop
+sudo nft add chain inet filter output { type filter hook output priority 0\; policy drop\; }
+
+
+
+Testing
+
+# Test allowed traffic
+nslookup google.com
+curl -I https://google.com
+
+# Test blocked traffic (try FTP)
+telnet ftp.example.com 21  # Should fail

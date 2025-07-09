@@ -21,6 +21,26 @@ Step 1: Prepare Client System
 sudo dnf install -y ipa-client
 
 
+# TCP ports
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --permanent --add-port=88/tcp
+firewall-cmd --permanent --add-port=389/tcp
+firewall-cmd --permanent --add-port=464/tcp
+
+# UDP ports
+firewall-cmd --permanent --add-port=88/udp
+firewall-cmd --permanent --add-port=464/udp
+firewall-cmd --permanent --add-port=123/udp  # Only if NTP is enabled
+
+# Reload firewall
+firewall-cmd --reload
+
+#configure
+ipa-client-install
+
+#Test from other server
+ssh -K user@clientmachine
+
 # Configure automatic home directory creation
 sudo authselect select sssd with-mkhomedir --force
 
